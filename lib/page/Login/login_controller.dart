@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Rupee_Rush/utils/Method.dart';
 import 'package:dio/dio.dart';
 import 'package:Rupee_Rush/request/Https.dart';
@@ -56,38 +58,260 @@ class LoginController extends GetxController {
   void copyInviteCode( context)  {
      ClipboardUtils.copyText('d558efef-71f7-4720-b8d2-e66de21e8b2a');
     // 复制完成后立即显示 Toast
+
     ToastUtils.showDelightToast(
       context: context,
       message: "邀请码已复制",
-      // 0.5 透明度 = 128 (0x80)
       color: AppMethod.hexToColor("#000000").withAlpha(128),
       iconColor: Colors.white,
       textColor: Colors.white,
     );
   }
 //弹窗函数
+  final isZh = true.obs;
+
+  Map<String, Map<String, String>> langMap = {
+    'zh': {
+      'title': '安全提示',
+      'body_top': 'GAID是您账户安全的重要凭据，仅用于本账户的身份验证。为保障您的权益，请注意以下事项：',
+      'item1': '1.切勿随意泄露',
+      'item2': '2.切勿随意泄露',
+      'item3': '3.切勿随意泄露',
+      'desc': 'GAID与您的设备及账户直接关联，不可通过社交媒体、邮件或短信提供给他人，避免被不法分子用于非法操作。',
+      'button': 'English'
+    },
+    'en': {
+      'title': 'Security Tip',
+      'body_top':
+      'GAID is an important credential for your account security, used solely for identity verification of this account. Please note the following to protect your rights:',
+      'item1': '1.Do not disclose it casually',
+      'item2': '2.Do not disclose it casually',
+      'item3': '3.Do not disclose it casually',
+      'desc':
+      'GAID is directly linked to your device and account. Do not provide it to others via social media, email, or SMS to prevent misuse by malicious actors.',
+      'button': '中文'
+    }
+  };
+  void toggleLang() {
+    isZh.value = !isZh.value;
+  }
+
   void showCustomDialog(BuildContext context) {
-  //是否是显示
-    if(isInviteCodeVisible.value){
+    if (isInviteCodeVisible.value) {
       toggleInviteCodeVisibility();
-    }else{
+    } else {
+      final count = 6.obs;
+      late Timer timer;
+      bool canPop = false;
+
+      timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        if (count.value > 0) {
+          count.value--;
+          if (count.value == 0) {
+            canPop = true;
+            timer.cancel();
+          }
+        }
+      });
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => CustomDialog(
-          body: Text('这是一个自定义弹窗'),
-          width: 300.w,
-          header: Text('标题'),
-          footer: InkWell(
-            onTap: () {
-              Navigator.of(context).pop(); // 关闭弹窗
-            },
-            child: Text('确定'),
+        builder: (dialogContext) => WillPopScope(
+          onWillPop: () async => canPop,
+          child: CustomDialog(
+            width: 300.w,
+            header: Obx(() => Container( // 使用 Obx 动态更新
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+              decoration: BoxDecoration(
+                color: AppMethod.hexToColor('#FF7810'),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    langMap[isZh.value ? 'zh' : 'en']!['title']!,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppMethod.hexToColor('#FFFFFF'),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      toggleLang(); // 切换语言
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 3.h),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 1.0),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text(
+                        langMap[isZh.value ? 'zh' : 'en']!['button']!,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )),
+            body: Obx(() => Column( // 使用 Obx 更新 body 文案
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  langMap[isZh.value ? 'zh' : 'en']!['body_top']!,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppMethod.hexToColor('#1A1A1A'),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppMethod.hexToColor('#000000'),
+                    borderRadius: BorderRadius.circular(4.w),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  child: Text(
+                    langMap[isZh.value ? 'zh' : 'en']!['item1']!,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppMethod.hexToColor('#FFFFFF'),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  langMap[isZh.value ? 'zh' : 'en']!['desc']!,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppMethod.hexToColor('#666666'),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppMethod.hexToColor('#000000'),
+                    borderRadius: BorderRadius.circular(4.w),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  child: Text(
+                    langMap[isZh.value ? 'zh' : 'en']!['item2']!,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppMethod.hexToColor('#FFFFFF'),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  langMap[isZh.value ? 'zh' : 'en']!['desc']!,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppMethod.hexToColor('#666666'),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppMethod.hexToColor('#000000'),
+                    borderRadius: BorderRadius.circular(4.w),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  child: Text(
+                    langMap[isZh.value ? 'zh' : 'en']!['item3']!,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppMethod.hexToColor('#FFFFFF'),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Text(
+                  langMap[isZh.value ? 'zh' : 'en']!['desc']!,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: AppMethod.hexToColor('#666666'),
+                  ),
+                ),
+              ],
+            )),
+            footer: Obx(() {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppMethod.hexToColor('#000000').withAlpha(25),
+                      offset: Offset(0, -1),
+                      blurRadius: 6,
+                    ),
+                  ],
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(0),
+                    topRight: Radius.circular(0),
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          '取消',
+                          style: TextStyle(
+                              color: AppMethod.hexToColor("#666666")),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 1.w,
+                      height: 24.h,
+                      color: Colors.grey,
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: canPop
+                            ? () {
+                          Navigator.of(context).pop();
+                          toggleInviteCodeVisibility();
+                        }
+                            : null,
+                        child: Text(
+                          canPop
+                              ? '去完成'
+                              : '去完成(${count.value})',
+                          style: TextStyle(
+                              color: canPop
+                                  ? AppMethod.hexToColor('#3C59FF')
+                                  : Colors.grey),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
           ),
         ),
-      );
+      ).then((_) {
+        timer.cancel();
+      });
     }
-
   }
 
   @override
@@ -139,6 +363,7 @@ class LoginController extends GetxController {
         Get.offAllNamed('/'); // 跳转到首页
       } else {
           ToastUtils.showDelightToast(
+            show: false,
             context: context,
             message: "密码错误",
             color: AppMethod.hexToColor("#FF5266"),

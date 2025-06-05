@@ -41,15 +41,17 @@ class ToastUtils {
   static void showDelightToast({
     required BuildContext context,
     required String message,
+    bool show = true,
     IconData icon = CupertinoIcons.bell_fill,
     bool autoDismiss = true,//是否自动关闭
-     int duration = 2000,//显示时长 ,
+    int duration = 2000,//显示时长 ,
     Widget? subtitle,
     Color  color = Colors.white,
     Color   iconColor = Colors.black,
     Color  textColor = Colors.black,
   }) {
-       DelightToastBar(
+     if(show)showLoading();hideLoading();
+    DelightToastBar(
       builder: (context) => ToastCard(
         leading: Icon(icon, size: 28,  color:iconColor),
         title: Text(
@@ -57,11 +59,12 @@ class ToastUtils {
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14,  color: textColor),
         ),
         subtitle:subtitle,
-          color : color,
+        color : color,
       ),
       autoDismiss: autoDismiss,
       snackbarDuration :Duration(milliseconds: duration),
       position: DelightSnackbarPosition.top,
     ).show(context);
   }
+
 }

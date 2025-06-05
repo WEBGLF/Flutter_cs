@@ -72,7 +72,7 @@ class CustomInput extends StatelessWidget {
           onPressed: onToggleObscure,
 
         )
-            : null,
+            : suffixIcon,
         errorText: errorText, // 显示错误提示
       ),
     );

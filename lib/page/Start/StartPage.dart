@@ -135,7 +135,7 @@ class _StartPageState extends State<StartPage> {
                         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                         minimumSize: Size(150.w, 49.h),
                       ),
-                      onPressed: () {},
+                      onPressed: ()=>Get.toNamed('/register'),
                       child: Text('Register', style: TextStyle(fontSize: 22.sp, color: AppMethod.hexToColor('#3C59FF'))),
                     ),
                   ),

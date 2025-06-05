@@ -6,8 +6,6 @@ import 'package:get/get.dart';
 import '../../components/CustomAppBar.dart';
 import '../../components/CustomInput.dart';
 import '../../generated/l10n.dart';
-import '../../utils/ClipboardUtils.dart';
-import '../../utils/ToastUtils.dart';
 import 'login_controller.dart';
 
 class LoginPage extends GetView<LoginController> {
@@ -198,9 +196,11 @@ class LoginPage extends GetView<LoginController> {
               children: [
                 if (controller.isInviteCodeVisible.value)
                   GestureDetector(
-                    onTap: ()=>controller.copyInviteCode(context),
+                    onTap: (){
+                      controller.copyInviteCode(context);
+                    },
                     child: Icon(
-                      Icons.copy,
+                      Icons.copy_all_sharp,
                       size: 24.sp,
                       color: AppMethod.hexToColor('#3C59FF'),
                     ),

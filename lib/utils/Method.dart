@@ -31,6 +31,21 @@ class AppMethod {
 
    return Color(colorValue);
   }
+
+  // 手机号加*
+  static String maskPhoneNumber(String phoneNumber) {
+   int length = phoneNumber.length;
+   // 如果长度小于6，不替换，直接返回原号码
+   if (length < 6) return phoneNumber;
+   int frontLength = (length ~/ 3); // 前段保留总长度的1/3
+   int backLength = (length ~/ 3);  // 后段也保留1/3
+
+   String front = phoneNumber.substring(0, frontLength);
+   String back = phoneNumber.substring(length - backLength);
+   String maskedMiddle = '*' * (length - frontLength - backLength);
+   return '$front$maskedMiddle$back';
+  }
+
 // 时间转为MM.dd格式的
  static String formatDate(String dateString) {
   DateTime dateTime = DateTime.parse(dateString).toLocal();
