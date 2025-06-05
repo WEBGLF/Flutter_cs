@@ -5,7 +5,11 @@ import 'package:Rupee_Rush/store/index.dart';
 import 'package:Rupee_Rush/utils/ToastUtils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../../components/CustomDialog.dart';
+import '../../utils/ClipboardUtils.dart';
 
 class LoginController extends GetxController {
   final username = ''.obs;
@@ -16,7 +20,8 @@ class LoginController extends GetxController {
 // 错误信息
   final usernameError = Rx<String?>(null);
   final passwordError = Rx<String?>(null);
-
+  // 邀请码显示状态
+  final RxBool isInviteCodeVisible = false.obs;
 
   @override
   void onInit() {
@@ -44,6 +49,46 @@ class LoginController extends GetxController {
     }
   }
 
+  // 切换邀请码显示状态
+  void toggleInviteCodeVisibility() {
+    isInviteCodeVisible.value = !isInviteCodeVisible.value;
+  }
+  void copyInviteCode( context)  {
+     ClipboardUtils.copyText('d558efef-71f7-4720-b8d2-e66de21e8b2a');
+    // 复制完成后立即显示 Toast
+    ToastUtils.showDelightToast(
+      context: context,
+      message: "邀请码已复制",
+      // 0.5 透明度 = 128 (0x80)
+      color: AppMethod.hexToColor("#000000").withAlpha(128),
+      iconColor: Colors.white,
+      textColor: Colors.white,
+    );
+  }
+//弹窗函数
+  void showCustomDialog(BuildContext context) {
+  //是否是显示
+    if(isInviteCodeVisible.value){
+      toggleInviteCodeVisibility();
+    }else{
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => CustomDialog(
+          body: Text('这是一个自定义弹窗'),
+          width: 300.w,
+          header: Text('标题'),
+          footer: InkWell(
+            onTap: () {
+              Navigator.of(context).pop(); // 关闭弹窗
+            },
+            child: Text('确定'),
+          ),
+        ),
+      );
+    }
+
+  }
 
   @override
   void onReady() {
