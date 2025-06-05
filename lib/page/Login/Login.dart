@@ -23,7 +23,7 @@ class LoginPage extends GetView<LoginController> {
           child: Column(
             children: [
               buildHeader(),
-              SizedBox(height: 26.w),
+              SizedBox(height: 25.w),
               buildUsernameInput(),
               const SizedBox(height: 20),
               buildPasswordInput(),
