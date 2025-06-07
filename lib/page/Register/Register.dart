@@ -42,7 +42,6 @@ class RegisterPage extends GetView<RegisterController> {
                 buildRegisterButton(context),
                 //底部提示
                 buildTips(),
-                ElevatedButton(onPressed:()=>controller.showOTPDialog(context), child:Text('cs') )
               ],
             ),
           ),

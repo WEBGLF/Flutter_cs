@@ -1,3 +1,4 @@
+import 'package:Rupee_Rush/utils/Method.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -25,7 +26,7 @@ class _BottomNavigationBarWidgetState
     super.initState();
     // 初始化每个 item 的动画控制器
     _animationControllers = List.generate(
-      4,
+      5,
           (index) => AnimationController(
         duration: const Duration(milliseconds: 150),
         vsync: this,
@@ -48,7 +49,7 @@ class _BottomNavigationBarWidgetState
       child: BottomAppBar(
         color: Colors.white,
         height: 60,
-        shape: const CircularNotchedRectangle(),
+       // shape: const CircularNotchedRectangle(),
         notchMargin: 10.0,
         child: SizedBox(
           height: kBottomNavigationBarHeight,
@@ -57,9 +58,10 @@ class _BottomNavigationBarWidgetState
             children: [
               _buildItem(0),
               _buildItem(1),
-              const SizedBox(), // 凹槽占位
+            //  const SizedBox(), // 凹槽占位
               _buildItem(2),
               _buildItem(3),
+              _buildItem(4),
             ],
           ),
         ),
@@ -77,7 +79,6 @@ class _BottomNavigationBarWidgetState
         await _animationControllers[index].forward();
         // 再播放放大动画
         await _animationControllers[index].reverse();
-
         // 通知外部更新状态
         widget.onTap(index);
       },
@@ -95,14 +96,19 @@ class _BottomNavigationBarWidgetState
           children: [
             Image.asset(
               isActive ? item.activeIcon : item.inactiveIcon,
-              width: 18,
-              height: 18,
+              width: 22.w,
+              height: 22.w,
             ),
             Text(
               item.label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+              style: isActive ? TextStyle(
+                fontSize: 10.sp,
+                color: AppMethod.hexToColor('#1A1A1A'),
+                fontWeight: FontWeight.bold,
+              ) : TextStyle(
+                fontSize: 10.sp,
+                color: AppMethod.hexToColor('#777777'),
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
@@ -113,24 +119,29 @@ class _BottomNavigationBarWidgetState
 
   final List<BottomNavItem> items = [
     BottomNavItem(
-      activeIcon: 'assets/barIcon/home_active.png',
-      inactiveIcon: 'assets/barIcon/home.png',
-      label: '首页',
+      activeIcon: 'assets/barIcon/Home_active.png',
+      inactiveIcon: 'assets/barIcon/Home.png',
+      label: 'Home',
     ),
     BottomNavItem(
-      activeIcon: 'assets/barIcon/hall_active.png',
-      inactiveIcon: 'assets/barIcon/hall.png',
-      label: '大厅',
+      activeIcon: 'assets/barIcon/BuyRp_active.png',
+      inactiveIcon: 'assets/barIcon/BuyRp.png',
+      label: 'Buy Rp',
     ),
     BottomNavItem(
-      activeIcon: 'assets/barIcon/tuto_active.png',
-      inactiveIcon: 'assets/barIcon/tuto.png',
-      label: '教程',
+      activeIcon: 'assets/barIcon/Offline_active.png',
+      inactiveIcon: 'assets/barIcon/Offline.png',
+      label: 'Offline',
     ),
     BottomNavItem(
-      activeIcon: 'assets/barIcon/mine_active.png',
-      inactiveIcon: 'assets/barIcon/mine.png',
-      label: '我的',
+      activeIcon: 'assets/barIcon/SellRp_active.png',
+      inactiveIcon: 'assets/barIcon/SellRp.png',
+      label: 'Sell Rp',
+    ),
+    BottomNavItem(
+      activeIcon: 'assets/barIcon/Mine_active.png',
+      inactiveIcon: 'assets/barIcon/Mine.png',
+      label: 'Mine',
     ),
   ];
 }

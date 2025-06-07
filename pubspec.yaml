@@ -47,6 +47,8 @@ flutter:
   assets:
     - assets/public/
     - assets/start/
+    - assets/home/
+    - assets/barIcon/
 
 
   # example:

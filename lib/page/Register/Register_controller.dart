@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:Rupee_Rush/components/OtpDialog.dart';
 import 'package:Rupee_Rush/utils/ToastUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,8 +16,6 @@ class RegisterController extends GetxController {
   final inviteCode = ''.obs; //邀请码
   final password = ''.obs; //密码
   final confirmPassword = ''.obs; //确认密码
-  final otp = ''.obs; //短信验证码
-
   //控制器默认值
   late final usernameController = TextEditingController(text: username.value);
   // 错误信息
@@ -109,12 +108,17 @@ class RegisterController extends GetxController {
   void toggleConfirmPasswordVisibility() {
     isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   }
-// 倒计时控制
+
+  // 倒计时控制
+  final otp = ''.obs; //短信验证码
+  final otpError = ''.obs;//错误提示
   final isCounting = false.obs;
   final countdownSeconds = 120.obs;
   Timer? _countdownTimer;
+  // 启动倒计时
   void startResendCountdown() {
     if (isCounting.value) return; // 防止重复启动
+    otpError.value = '';
     isCounting.value = true;
     countdownSeconds.value = 120;
     _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -124,18 +128,20 @@ class RegisterController extends GetxController {
       }
     });
   }
+// 停止倒计时
   void stopResendCountdown() {
     _countdownTimer?.cancel();
     _countdownTimer = null;
     isCounting.value = false;
   }
+
   //显示OTP弹框
   void showOTPDialog(BuildContext context) {
     // 弹窗关闭时释放资源
     void disposeControllersAndFocusNodes() {
+      otpError.value = '';
       // 这里可以添加清理逻辑（如果有）
     }
-    String otpError ='';
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -147,123 +153,20 @@ class RegisterController extends GetxController {
           child: StatefulBuilder(
             builder: (context, setState) {
               return CustomDialog(
-                body: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Please enter OTP',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'OTP sent to',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppMethod.hexToColor("#B3B3B3"),
-                          ),
-                        ),
-                        SizedBox(width: 5.w),
-                        Text(
-                          AppMethod.maskPhoneNumber(username.value),
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppMethod.hexToColor("#1A1A1A"),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 30.h),
-                    PinCodeTextField(
-                      appContext: context,
-                      length: 6, // 验证码长度
-                      keyboardType: TextInputType.number,
-                      pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(6.w),
-                        fieldHeight: 40.h,
-                        fieldWidth: 38.w,
-                        borderWidth: 0.1,
-                        inactiveColor: AppMethod.hexToColor("#EDEDED"),
-                        activeColor: const Color(0xFF3C59FF),
-                        selectedColor: const Color(0xFF3C59FF),
-                        inactiveFillColor: AppMethod.hexToColor("#EDEDED"),
-                        selectedFillColor: AppMethod.hexToColor("#EDEDED"),
-                        activeFillColor: AppMethod.hexToColor("#EDEDED"),
-                        fieldOuterPadding: EdgeInsets.symmetric(
-                          horizontal: 0.1.w,
-                        ),
-                      ),
-                      onChanged: (value) {
-                      },
-                      onCompleted: (value) {
-                        otp.value = value;
-                        if (value == '352000') {
-                          // 验证成功，关闭弹窗
-                          Navigator.of(context).pop();
-                        } else {
-                          otpError = 'Validation error';
-                          setState(() {});
-                        }
-                      },
-                      textStyle: TextStyle(
-                        fontSize: 20.sp,
-                        color: Colors.black,
-                      ),
-                      animationType: AnimationType.scale,
-                      animationDuration: Duration(milliseconds: 300),
-                      backgroundColor: Colors.transparent,
-                      enableActiveFill: true,
-                      cursorHeight: 20.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          otpError,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppMethod.hexToColor("#DB0000"),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Obx(() {
-                          final isSending = isCounting.value;
-                          final seconds = countdownSeconds.value;
-
-                          return InkWell(
-                            onTap: isSending
-                                ? null
-                                : () {
-                              startResendCountdown(); // 开始倒计时
-                              ToastUtils.showDelightToast(
-                                context: context,
-                                message: '已发送验证码',
-                                duration: 2000,
-                              );
-                            },
-                            child: Text(
-                              isSending ? 'Resend in ($seconds s)' : 'ReSend OTP',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: isSending
-                                    ? AppMethod.hexToColor("#B3B3B3")
-                                    : AppMethod.hexToColor("#3C59FF"),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        }),
-
-                      ],
-                    )
-                  ],
+                body: OtpDialog(
+                  phoneNumber: username.value,
+                  countdownSeconds: countdownSeconds,
+                  isCounting: isCounting,
+                  errorText: otpError,
+                  onResendPressed: startResendCountdown,
+                  onOtpCompleted: (value) {
+                    otp.value = value;
+                    if (value == '352000') {
+                      Navigator.of(context).pop();
+                    }else {
+                      otpError.value = 'Validation error';
+                    }
+                  },
                 ),
               );
             },
@@ -285,9 +188,7 @@ class RegisterController extends GetxController {
     inviteCodeError.value = null;
     passwordError.value = null;
     confirmPasswordError.value = null;
-
     bool hasError = false;
-
     if (username.value.isEmpty) {
       usernameError.value = '请输入用户名';
       hasError = true;

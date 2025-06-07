@@ -17,20 +17,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   RxString flag = 'zh'.obs;
-  RxInt _counter = 0.obs;
   final RxInt _selectedIndex = 0.obs;
-  void _incrementCounter() {
-    _counter++;
-    flag.value = flag.value == 'zh' ? 'en' : 'zh';
-    S.load(Locale(flag.value, ''));
-    Get.updateLocale(Locale(flag.value, ''));
-  }
+
   void _onItemTapped(int index) {
     debugPrint('You have clicked the item at index $index');
       _selectedIndex.value = index;
-  }
-  _webView() async {
-    await Get.toNamed('/web_view', arguments: {"url": 'https://www.baidu.com'});
   }
 
   void shareTextAndLink() {
@@ -64,52 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(S().title),
       ),
       body: Center(
-        child: ListView(
+        child: Column(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Obx(() => Text('$flag')),
-                Obx(
-                  () => Text(
-                    '$_counter',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
-                Container(
-                  width: 200.w,
-                  height: 100.h,
-                  padding: EdgeInsets.all(10.w),
-                  child: Text('Hello World', style: TextStyle(fontSize: 32.sp)),
-                ),
-                SizedBox(height: 10.h),
-                ElevatedButton(onPressed: _webView, child: Text('外部网站')),
-                ElevatedButton(
-                  onPressed: () async {
-                    await ClipboardUtils.copyText("https://your-url.com");
-                    Get.snackbar("提示", "已复制链接");
-                  },
-                  child: const Text("复制链接"),
-                ),
-
-                ElevatedButton(
-                  onPressed: () async {
-                    String? text = await ClipboardUtils.getClipboardText();
-                    if (text != null && text.isNotEmpty) {
-                      Get.snackbar("粘贴内容", text);
-                    }
-                    shareTextAndLink();
-                  },
-                  child: const Text("粘贴"),
-                ),
-                SizedBox(height: 10.h),
-                ElevatedButton(
-                  onPressed: () {
-                    Get.toNamed('/swiper');
-                  },
-                  child: Text('轮播图'),
-                ),
-              ],
+            Text(
+              'You have pushed the button this many times:',
             ),
           ],
         ),
@@ -118,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _selectedIndex.value,
         onTap: _onItemTapped,
       )),
-      floatingActionButton: FloatingActionButton(
+   /*   floatingActionButton: FloatingActionButton(
         onPressed: () {},
         shape: CircleBorder(),          // 明确设置为圆形
         elevation: 6.0,
@@ -132,8 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
 
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-// This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,*/
     );
   }
 }
